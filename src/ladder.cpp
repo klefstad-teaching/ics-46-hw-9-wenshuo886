@@ -16,26 +16,40 @@ void error(string word1, string word2, string msg)
 
 bool edit_distance_within(const std::string& str1, const std::string& str2, int d)
 {
-    if(str1.length() != str2.length()) return false;
+    int len1 = str1.length(), len2 = str2.length();
     
-    int count = 0;
-    for(int i = 0; i < str1.length(); ++i)
+    if(abs(len1 - len2) > d) return false;
+
+    int i = 0, j = 0, diff_count = 0;
+
+    while (i < len1 && j < len2)
     {
-        if(str1[i] != str2[i])
+        if (str1[i] != str2[j])
         {
-            ++count;
-            if(count > d)
-                return false;
+            diff_count++;
+            if (diff_count > d) return false;
+
+            if (len1 < len2) j++;
+            else if (len1 > len2) i++;
+            else { i++; j++; }
+        }
+        else
+        {
+            i++;
+            j++;
         }
     }
-    return count <= d;
+    
+    diff_count += (len1 - i) + (len2 - j);
+    
+    return diff_count <= d;
 }
+
 
 bool is_adjacent(const string& word1, const string& word2)
 {
-    return edit_distance_within(word1, word2, 1);
+    return edit_distance_within(word1, word2, 1) || edit_distance_within(word1, word2, 2);
 }
-
 vector<string> generate_word_ladder(const string& begin_word, const string& end_word, const set<string>& word_list)
 {
     queue<vector<string>> q;
